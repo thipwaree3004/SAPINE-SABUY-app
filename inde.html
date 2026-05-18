@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPINE SABUY - Expert AI Edition</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root { 
+      --main-blue: #0056B3; 
+      --light-sky: #E0F2FF; 
+      --bg-gradient: linear-gradient(180deg, #CDE8FB 0%, #E2F1FC 100%);
+      --dark-blue: #0A2249; 
+      --text-blue: #1C447A;
+      --success: #28a745; 
+      --danger: #dc3545; 
+    }
+    body { 
+      font-family: 'Kanit', sans-serif; 
+      margin: 0; 
+      background: var(--bg-gradient); 
+      color: #333; 
+      min-height: 100vh; 
+      overflow-x: hidden; 
+    }
+    .app-shell { 
+      max-width: 500px; 
+      margin: 0 auto; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      background: var(--bg-gradient);
+    }
+    
+    .logo-top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 45px;
+      height: 45px;
+      background: white;
+      border-radius: 50%;
+      padding: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .logo-top-right img { width: 90%; }
+
+    .header { 
+      display: flex; 
+      align-items: center; 
+      padding: 20px 15px; 
+      gap: 15px; 
+      width: 100%; 
+      box-sizing: border-box; 
+    }
+    
+    .back-btn { 
+      width: 40px; 
+      height: 40px; 
+      border: 2px solid #000; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      background: transparent; 
+      font-weight: bold; 
+      font-size: 20px;
+    }
+    
+    .title-pill { 
+      background: white; 
+      padding: 8px 25px; 
+      border-radius: 20px; 
+      font-weight: 600; 
+      flex: 1; 
+      text-align: center; 
+      color: var(--text-blue); 
+      font-size: 18px; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .screen { 
+      display: none; 
+      padding: 20px; 
+      flex: 1; 
+      flex-direction: column; 
+      align-items: center; 
+      animation: fadeIn 0.3s ease; 
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Buttons */
+    .btn-white { 
+      width: 80%; 
+      background: white; 
+      padding: 15px 25px; 
+      margin: 8px 0; 
+      border-radius: 30px; 
+      border: none; 
+      text-align: center; 
+      font-size: 16px; 
+      cursor: pointer; 
+      color: var(--text-blue); 
+      transition: 0.2s; 
+      font-weight: 600; 
+      font-family: 'Kanit';
+      line-height: 1.4;
+    }
+    .btn-white:active { transform: scale(0.98); }
+
+    .btn-choice {
+      width: 95%; 
+      background: white; 
+      padding: 25px 20px; 
+      margin: 10px 0; 
+      border-radius: 30px; 
+      border: none; 
+      text-align: center; 
+      font-size: 14px; 
+      cursor: pointer; 
+      color: var(--text-blue); 
+      font-weight: 600; 
+      font-family: 'Kanit';
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      line-height: 1.6;
+    }
+
+    .btn-dark {
+      width: 100%;
+      background: var(--dark-blue);
+      color: white;
+      padding: 20px;
+      border-radius: 20px;
+      margin: 10px 0;
+      text-align: left;
+      border: none;
+      font-size: 16px;
+      font-family: 'Kanit';
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 120px; 
+      position: relative;
+      overflow: hidden;
+      min-height: 90px;
+    }
+    .btn-dark::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      bottom: 15px;
+      width: 80px;
+      background: #153366;
+      border-radius: 12px;
+    }
+
+    /* Daily Life Cards Style */
+    .daily-detail-card { 
+      background: white; 
+      border-radius: 25px; 
+      padding: 20px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+      margin-bottom: 15px; 
+      text-align: left;
+    }
+    .daily-title { 
+      color: var(--text-blue); 
+      font-weight: bold; 
+      font-size: 18px; 
+      margin-bottom: 12px; 
+      border-bottom: 2px solid var(--light-sky); 
+      padding-bottom: 5px;
+    }
+    .daily-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .compare-box { border-radius: 15px; padding: 12px; text-align: center; font-size: 13px; line-height: 1.5; }
+    .compare-box.good { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .compare-box.bad { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+    .compare-icon { font-size: 22px; margin-bottom: 5px; }
+    .compare-desc { text-align: left; }
+
+    .brand-title {
+      font-size: 50px; 
+      font-weight: 800; 
+      color: #0056B3; 
+      margin-bottom: 30px; 
+      text-align: left; 
+      line-height: 1;
+      font-style: italic;
+      letter-spacing: -1px;
+    }
+
+  
+
+    /* Video Placeholder Style */
+    .video-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background-color: #f0f4f8;
+      border: 2px dashed #0056B3;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #0056B3;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* AI Video & UI */
+    .video-wrap { width: 100%; aspect-ratio: 3/4; background: #000; border-radius: 25px; border: 6px solid var(--danger); overflow: hidden; position: relative; transition: 0.3s; margin-top: 10px;}
+    .video-wrap.correct { border-color: var(--success); }
+    canvas { width: 100% !important; height: 100% !important; transform: scaleX(-1); }
+    .video-hidden { display: none; }
+    
+    .progress-container { width: 100%; height: 24px; background: #eee; border-radius: 12px; margin: 15px 0; overflow: hidden; border: 1px solid #ccc; position: relative;}
+    #progress-fill { width: 0%; height: 100%; background: var(--main-blue); transition: 0.1s linear; }
+    #timer-text { position: absolute; width: 100%; text-align: center; font-weight: bold; line-height: 22px; color: #333; font-size: 14px; z-index: 2; }
+    
+    .status-card { background: white; width: 100%; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px; border-left: 8px solid var(--danger); transition: 0.3s; box-sizing: border-box;}
+    .status-card.correct { border-left-color: var(--success); }
+
+    .center-screen { justify-content: center; align-items: center; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="logo-top-right" id="global-logo" style="display: none;">
+    <img src="V/LG.png" alt="Logo">
+  </div>
+
+  <div id="splash" class="screen center-screen" style="display: flex;">
+    <div style="background: white; padding: 40px 30px; border-radius: 40px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+      <img src="V/LG.png" width="120" style="margin: 0 auto;">
+      <h3 style="color: var(--main-blue); margin: 20px 0 5px; font-weight: 600;">กายภาพบำบัด</h3>
+      <p style="font-size: 14px; color: #666; margin: 0;">สถาบันประสาทวิทยา<br>Physical Therapy of NIT</p>
+    </div>
+  </div>
+
+  <div id="start" class="screen center-screen">
+    <div style="width: 100%; padding-left: 40px; margin-bottom: 40px;">
+        <h1 class="brand-title">SPINE<br>SABUY.</h1>
+    </div>
+    <button class="btn-white" style="width: 160px; font-size: 18px;" onclick="nav('menu')">เริ่มต้น</button>
+  </div>
+
+  <div id="menu" class="screen center-screen">
+    <div class="line-art" style="margin-top: 20px;"></div>
+    <div style="width: 100%; padding-left: 40px; margin-bottom: 30px;">
+        <h1 class="brand-title">SPINE<br>SABUY.</h1>
+    </div>
+    <button class="btn-white" onclick="nav('learn-menu')">เรียนรู้ 📖</button>
+    <button class="btn-white" onclick="nav('ai-parts')">ออกกำลังกาย 📋</button>
+  </div>
+
+  <div id="learn-menu" class="screen">
+    <div class="header">
+        <div class="back-btn" onclick="nav('menu')">↶</div>
+        <div class="title-pill">เรียนรู้ 📖</div>
+    </div>
+    <div style="width: 100%; padding: 0 10px; box-sizing: border-box; margin-top: 10px; overflow-y: auto;">
+        <button class="btn-dark" onclick="showChoice('neck')">ท่าออกกำลังกาย<br>ระดับ : คอ</button>
+        <button class="btn-dark" onclick="showChoice('chest')">ท่าออกกำลังกาย<br>ระดับ : อก</button>
+        <button class="btn-dark" onclick="showChoice('waist')">ท่าออกกำลังกาย<br>ระดับ : เอว</button>
+        <button class="btn-dark" onclick="nav('learn-daily')">การใช้ชีวิตประจำวัน<br>เพื่อป้องกันปวดหลัง 💡</button>
+    </div>
+  </div>
+
+  <div id="learn-daily" class="screen" style="overflow-y: auto; max-height: 100vh;">
+    <div class="header">
+        <div class="back-btn" onclick="nav('learn-menu')">↶</div>
+        <div class="title-pill">การใช้ชีวิตประจำวัน 💡</div>
+    </div>
+    <div style="width: 100%; padding-bottom: 30px; box-sizing: border-box;">
+        <div class="daily-detail-card">
+          <div class="daily-title">การยกของ 📦</div>
+          <div class="daily-compare">
+            <div class="compare-box good">
+              <div class="compare-icon">✅</div>
+              <div class="compare-desc">เดินเข้าใกล้ของ ย่อตัวลงให้ใกล้ที่สุด แล้วใช้แรงจากขาในการยกขึ้น โดยให้ของชิดลำตัว</div>
+            </div>
+            <div class="compare-box bad">
+              <div class="compare-icon">❌</div>
+              <div class="compare-desc">ก้มตัวลงไปยกของในท่าเข่าเหยียดตรง ซึ่งจะทำให้หลังต้องรับน้ำหนักมากเกินไป</div>
+            </div>
+          </div>
+        </div>
+        <div class="daily-detail-card">
+          <div class="daily-title">การยืน 🚶‍♂️</div>
+          <div class="daily-compare">
+            <div class="compare-box good">
+              <div class="compare-icon">✅</div>
+              <div class="compare-desc">ปล่อยแขนไว้ข้างลำตัวสบายๆ ทิ้งน้ำหนักบริเวณฝ่าเท้าทั้งสองข้าง หากต้องยืนนาน ควรมีที่พักเท้าต่ำๆ</div>
+            </div>
+            <div class="compare-box bad">
+              <div class="compare-icon">❌</div>
+              <div class="compare-desc">ลงน้ำหนักเฉพาะส้นเท้า ยืนหลังแอ่น หรือสวมรองเท้าส้นสูงเป็นเวลานาน</div>
+            </div>
+          </div>
+        </div>
+        <div class="daily-detail-card">
+          <div class="daily-title">การนั่ง 🪑</div>
+          <div class="daily-compare">
+            <div class="compare-box good">
+              <div class="compare-icon">✅</div>
+              <div class="compare-desc">นั่งหลังตรง แนบไปกับพนักพิง เท้าทั้งสองข้างวางราบกับพื้น ข้อเข่าทำมุมประมาณ 90 องศา</div>
+            </div>
+            <div class="compare-box bad">
+              <div class="compare-icon">❌</div>
+              <div class="compare-desc">นั่งก้มตัว หลังค่อม นั่งห่างจากพนักพิง หรือเก้าอี้มีความสูงไม่พอดีกับโต๊ะ</div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="learn-choice" class="screen">
+    <div class="header">
+        <div class="back-btn" onclick="nav('learn-menu')">↶</div>
+        <div class="title-pill" id="choice-title">คอ 📖</div>
+    </div>
+    <div id="choice-container" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 20px;"></div>
+  </div>
+
+  <div id="learn-list" class="screen" style="overflow-y: auto;">
+    <div class="header">
+        <div class="back-btn" onclick="nav('learn-choice')">↶</div>
+        <div class="title-pill">เลือกท่าทาง 📖</div>
+    </div>
+    <div id="list-container" style="width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 20px;"></div>
+  </div>
+
+  <div id="learn-detail" class="screen" style="overflow-y: auto;">
+    <div class="header">
+        <div class="back-btn" id="detail-back-btn">↶</div>
+        <div class="title-pill" id="detail-header-txt">รายละเอียด</div>
+    </div>
+    <div style="background: white; border-radius: 30px; padding: 25px; width:100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 10px; margin-bottom: 30px;">
+      
+      <div id="detail-step" style="font-weight: bold; color: var(--main-blue); font-size: 18px; text-align: center;">ท่าที่ 1</div>
+      <div id="detail-name" style="margin: 5px 0 20px; font-weight: 600; font-size: 16px; text-align: center;">ชื่อท่า</div>
+      
+      <video id="detail-video-player" controls playsinline style="width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; background: #000;">
+        <source src="" type="video/mp4">
+      </video>
+
+      <div class="video-placeholder" id="detail-video-error" style="display: flex;">
+        <span style="font-size: 24px; margin-bottom: 5px;">▶️</span>
+        <span>ยังไม่มีวิดีโอสาธิตสำหรับท่านี้</span>
+      </div>
+
+      <div id="detail-desc" style="background:#E0F2FF; padding:20px; border-radius:20px; font-size:14px; text-align:center; color: var(--text-blue); line-height: 1.6;"></div>
+    </div>
+  </div>
+
+  <div id="ai-parts" class="screen" style="overflow-y: auto; max-height: 100vh;">
+    <div class="header">
+        <div class="back-btn" onclick="nav('menu')">↶</div>
+        <div class="title-pill">โหมด AI 📋</div>
+    </div>
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; padding-bottom: 20px;">
+        <button class="btn-white" onclick="startTraining('neck', 'strength')">ระดับคอ (แข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('neck', 'stretch')">ระดับคอ (ยืดหยุ่น)</button>
+        <button class="btn-white" onclick="startTraining('chest', 'strength')">ระดับอก (แข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('chest', 'stretch')">ระดับอก (ยืดหยุ่น)</button>
+        <button class="btn-white" onclick="startTraining('waist', 'strength')">ระดับเอว (แข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('waist', 'stretch')">ระดับเอว (ยืดหยุ่น)</button>
+    </div>
+  </div>
+
+  <div id="ai-preview" class="screen">
+    <div class="header">
+        <div class="back-btn" onclick="stopAI()">↶</div>
+        <div class="title-pill">ตัวอย่างท่าทาง</div>
+    </div>
+    <div style="background: white; width: 100%; border-radius: 20px; padding: 20px; box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+      <h3 id="preview-pose-name" style="color: var(--text-blue); margin-top: 0; font-size: 16px;">ชื่อท่า</h3>
+      <div style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 15px; overflow: hidden; margin-bottom: 15px;">
+        <video id="preview-video" controls playsinline style="width: 100%; height: 100%; object-fit: cover;">
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+      <p id="preview-instr" style="font-size: 14px; color: #666;"></p>
+      <button class="btn-white" style="background: var(--success); color: white; margin-top: 20px; width: 100%;" onclick="startAICamera()">พร้อมแล้ว (เปิดกล้อง) 📸</button>
+    </div>
+  </div>
+
+  <div id="training" class="screen">
+    <div class="header">
+        <div class="back-btn" onclick="stopAI()">↶</div>
+        <div class="title-pill" id="ai-title">ระบบ AI 📋</div>
+    </div>
+    <div id="ai-card" class="status-card">
+      <div id="ai-pose-name" style="font-weight: bold; color: var(--text-blue);">กำลังโหลด...</div>
+      <div id="ai-instr" style="font-size: 13px; color: #666;"></div>
+    </div>
+    <div id="ai-border" class="video-wrap">
+      <video class="video-hidden" playsinline></video>
+      <canvas class="output_canvas"></canvas>
+    </div>
+    <div class="progress-container">
+        <div id="timer-text">0 / 0 วินาที</div>
+        <div id="progress-fill"></div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; width: 100%; padding: 0 10px; box-sizing: border-box; margin-bottom: 10px; font-weight: bold; color: var(--text-blue); font-size: 16px;">
+        <div id="ai-reps">รอบที่: 0 / 10</div>
+        <div id="ai-stars">⭐ 0 ดวง</div>
+    </div>
+
+    <div id="ai-feedback" style="font-weight: 600; color: var(--danger); text-align: center; background: white; padding: 10px 20px; border-radius: 20px; margin-bottom: 10px; width: 90%; box-sizing: border-box;">❌ จัดท่าทางไม่ถูกต้อง</div>
+    <button id="next-pose-btn" class="btn-white" style="display:none; background: var(--success); color: white; width: 100%;" onclick="nextAIPose()">ท่าต่อไป ✅</button>
+  </div>
+
+</div>
+
+<script>
+  const uiLabels = {
+    neck: { title: "คอ 📖", strength: "ท่าออกกำลังกายเพิ่มความแข็งแรง<br>ของกระดูกสันหลังระดับคอ", stretch: "ท่าออกกำลังกายเพิ่มความยืดหยุ่น<br>ของกระดูกสันหลังระดับคอ" },
+    chest: { title: "อก 📖", strength: "ท่าออกกำลังกายเพิ่มความแข็งแรง<br>กล้ามเนื้อกระดูกสันหลังระดับอก", stretch: "ท่าออกกำลังกายเพิ่มความยืดหยุ่น<br>ของกล้ามเนื้อกระดูกสันหลังระดับอก" },
+    waist: { title: "เอว 📖", strength: "ท่าออกกำลังกายเพิ่มความแข็งแรง<br>ของกล้ามเนื้อส่วนหลัง", stretch: "ท่าออกกำลังกายเพิ่มความยืดหยุ่น<br>ของกล้ามเนื้อส่วนเอว" }
+  };
+
+  const db = {
+    neck: {
+      strength: [
+        { n: "เกร็งกล้ามเนื้อต้านแรงกับฝ่ามือโดยไม่มีการเคลื่อนไหวของคอ", d: "ใช้ฝ่ามือดันศีรษะเพื่อเกร็งกล้ามเนื้อต้านแรง ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "static", video: "V/ดันหน้า.mp4" },
+      ],
+      stretch: [
+        { n: "ท่ายืดกล้ามเนื้อคอด้านหน้า", d: "นั่งตัวตรง มือทั้งสองข้างประสานกันวางไว้ที่บริเวณกระดูกไหปลาร้า เงยหน้าขึ้น ค้างไว้ 10 วินาที จากนั้นกลับมาสู่ท่าเริ่มต้น ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "up", video: "V/ยืดคอ.mp4" },
+        { n: "ท่ายืดกล้ามเนื้อคอด้านหลัง", d: "นั่งตัวตรง มือทั้งสองข้างประสานกันวางไว้ที่บริเวณท้ายทอย ก้มหน้าลง ค้างไว้ 10 วินาที จากนั้นกลับมาสู่ท่าเริ่มต้น ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "down", video: "V/ก้ม.mp4" },
+        { n: "ท่ายืดกล้ามเนื้อคอด้านซ้าย", d: "นั่งตัวตรง มือข้างหนึ่งไพล่หลัง หมุนศีรษะและเอนลงไปฝั่งตรงข้าม ใช้มืออีกข้างดึงศีรษะเอนหาไหล่ให้มากที่สุด (โดยไม่ยกไหล่ตาม) ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง แล้วสลับข้าง", time: 10, reps: 10, type: "neck_left", video: "V/หนุมซ้าย.mp4" },
+        { n: "ท่ายืดกล้ามเนื้อคอด้านขวา", d: "นั่งตัวตรง มือข้างหนึ่งไพล่หลัง หมุนศีรษะและเอนลงไปฝั่งตรงข้าม ใช้มืออีกข้างดึงศีรษะเอนหาไหล่ให้มากที่สุด (โดยไม่ยกไหล่ตาม) ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง แล้วสลับข้าง", time: 10, reps: 10, type: "neck_right", video: "V/หนุมขวา.mp4" },
+      ]
+    },
+    chest: {
+      strength: [
+        { n: "การบริหารกล้ามเนื้อสะบักโดยใช้ยางยืด", d: "จับปลายแต่ละด้านของยางยืด ทำการดึงโดยการเกร็งของสะบักชิดกัน ดึงมือออกพร้อมกันหรือดึงทีละข้างก็ได้ ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "pull", video: "V/ยาง.mp4" },
+        { n: "การบริหารกล้ามเนื้ออกและสะบัก", d: "ยืนห่างจากผนัง 1 ช่วงแขน วางมือระดับไหล่ จากนั้นค่อยๆ งอศอกโน้มตัวเข้าหากำแพงจนหน้าอกเกือบชิดกำแพงแล้วดันตัวกลับ ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "pushwall", video: "V/ดัน.mp4" }
+      ],
+      stretch: [
+        { n: "ท่ายืดกล้ามเนื้ออก (มือประสานท้ายทอย)", d: "ประสานมือไว้ที่ท้ายทอย จากนั้นหนีบสะบักเข้าหากันพร้อมกับกางแขนออก ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "stretch_chest", video: "V/สะบัก.mp4" },
+        { n: "ท่ายืดกล้ามเนื้ออก (มือประสานด้านหลัง)", d: "ประสานมือไว้ด้านหลัง เหยียดข้อศอกให้ตรง ยืดอกขึ้นพร้อมกับหนีบสะบักเข้าหากัน ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "stretch_chest", video: "V/หนีบ.mp4" },
+        { n: "ท่ายืดกล้ามเนื้ออก (พิงกำแพง)", d: "ยืนตรงหันข้างให้กำแพงหรือผนัง ยกมือข้างขวาไว้ที่ผนังหรือกำแพง บิดลำตัวออกจากผนัง ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง ", time: 10, reps: 10, type: "stretch_chest", video: "V/หันข้าง.mp4" },
+        { n: "ท่ายืดกล้ามเนื้ออก (พิงกำแพง)", d: "ยืนตรงหันข้างให้กำแพงหรือผนัง ยกมือข้างขวาไว้ที่ผนังหรือกำแพง บิดลำตัวออกจากผนัง ค้างไว้ 10 วินาที ทำซ้ำ 10 ครั้ง ", time: 10, reps: 10, type: "stretch_chest", video: "V/หันซ้าย.mp4" }
+      ]
+    },
+    waist: {
+      strength: [
+        { n: "ท่ายกสะโพก", d: "นอนหงาย ชันเข่า 2 ข้าง วางมือไว้ข้างลำตัว ยกสะโพกขึ้นลอยพ้นจากเตียง จากนั้นวางสะโพกลงกลับลงสู่ท่าเริ่มต้น ทำซ้ำ 10 ครั้ง", time: 10, reps: 10, type: "bridge", video: "V/นอนหงาย.mp4" }
+      ],
+      stretch: [
+        { n: "ท่ายืดกล้ามเนื้อต้นขาด้านหลัง", d: "นอนหงาย ใช้ผ้าคล้องปลายเท้าดึงปลายเท้าขาข้างหนึ่ง จากนั้นยกขาขึ้นพร้อมออกแรงดึงผ้า จนรู้สึกตึงน่องและด้านหลังของขา ค้างไว้ 10 วินาที แล้ววางเท้าลง ทำ 10 ครั้ง แล้วสลับทำอีกข้างหนึ่ง", time: 10, reps: 10, type: "leg_stretch", video: "V/นอนผ้า.mp4" }
+      ]
+    }
+  };
+
+  let curPart = '', curType = '';
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => { nav('start'); }, 2500);
+  });
+
+  function nav(id) {
+    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+    document.getElementById(id).style.display = 'flex';
+    
+    const logo = document.getElementById('global-logo');
+    if(id === 'start' || id === 'menu') { logo.style.display = 'flex'; } 
+    else { logo.style.display = 'none'; }
+  }
+
+  function showChoice(part) {
+    curPart = part; nav('learn-choice');
+    document.getElementById('choice-title').innerHTML = uiLabels[part].title;
+    const con = document.getElementById('choice-container'); con.innerHTML = '';
+    
+    if(db[part].strength) con.innerHTML += `<button class="btn-choice" onclick="showList('strength')">${uiLabels[part].strength}</button>`;
+    if(db[part].stretch) con.innerHTML += `<button class="btn-choice" onclick="showList('stretch')">${uiLabels[part].stretch}</button>`;
+  }
+
+  function showList(type) {
+    curType = type; nav('learn-list');
+    const con = document.getElementById('list-container'); con.innerHTML = '';
+    if(db[curPart][type]) {
+        db[curPart][type].forEach((p, i) => {
+            con.innerHTML += `<button class="btn-white" style="font-size: 14px;" onclick="showDetail(${i})">ท่าที่ ${i+1}: ${p.n}</button>`;
+        });
+    }
+  }
+
+  function showDetail(idx) {
+    nav('learn-detail');
+    const p = db[curPart][curType][idx];
+    document.getElementById('detail-step').innerText = `ท่าที่ ${idx+1}`;
+    document.getElementById('detail-name').innerText = p.n;
+    document.getElementById('detail-desc').innerText = p.d;
+    
+    const vidPlayer = document.getElementById('detail-video-player');
+    const vidError = document.getElementById('detail-video-error');
+
+    if (p.video && p.video !== "") {
+      vidPlayer.src = p.video;
+      vidPlayer.style.display = 'block';
+      vidError.style.display = 'none';
+      vidPlayer.load();
+    } else {
+      vidPlayer.style.display = 'none';
+      vidError.style.display = 'flex';
+      vidPlayer.pause();
+    }
+
+    document.getElementById('detail-back-btn').onclick = () => {
+      vidPlayer.pause();
+      showList(curType);
+    };
+  }
+
+  /* AI ENGINE CODE */
+  let aiPart='', aiType='', aiIdx=0, timer=0, lastFrameTime=Date.now();
+  let curRep = 0, totalStars = 0; // ตัวแปรคุมจำนวนรอบและดาวรางวัลรวม
+  const videoElement = document.querySelector('.video-hidden');
+  const canvasElement = document.querySelector('.output_canvas');
+  const canvasCtx = canvasElement.getContext('2d');
+  let camera = null;
+
+  // ฟังก์ชันสังเคราะห์เสียง "ติ้ง" คุณภาพสูงผ่าน Web Audio API
+  function playDing() {
+      try {
+          const context = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = context.createOscillator();
+          const gain = context.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, context.currentTime); // โน้ตเสียงสูง ใสสะอาด
+          gain.gain.setValueAtTime(0.4, context.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4); // เสียงค่อยๆ เฟดดับละมุน
+          osc.connect(gain);
+          gain.connect(context.destination);
+          osc.start();
+          osc.stop(context.currentTime + 0.4);
+      } catch (e) {
+          console.log("Audio contexts active status restrictions:", e);
+      }
+  }
+
+  function startTraining(part, type) { aiPart = part; aiType = type; aiIdx = 0; timer = 0; curRep = 0; showPreview(); }
+  
+  function showPreview() {
+    const p = db[aiPart][aiType][aiIdx];
+    document.getElementById('preview-pose-name').innerText = p.n;
+    document.getElementById('preview-instr').innerText = p.d;
+    
+    const vid = document.getElementById('preview-video');
+    if (p.video && p.video !== "") {
+        vid.src = p.video;
+    } else {
+        vid.src = "https://www.w3schools.com/html/mov_bbb.mp4";
+    }
+    
+    vid.load(); vid.play(); nav('ai-preview');
+  }
+
+  function startAICamera() { document.getElementById('preview-video').pause(); nav('training'); updatePoseUI(); if(!camera) initMediaPipe(); }
+  
+  function updatePoseUI() {
+    const p = db[aiPart][aiType][aiIdx];
+    document.getElementById('ai-pose-name').innerText = p.n;
+    document.getElementById('ai-instr').innerText = p.d;
+    document.getElementById('timer-text').innerText = `0 / ${p.time} วินาที`;
+    document.getElementById('progress-fill').style.width = "0%";
+    document.getElementById('next-pose-btn').style.display = "none";
+    timer = 0;
+    curRep = 0; // รีเซ็ตรอบสำหรับการเปลี่ยนท่าใหม่
+    document.getElementById('ai-reps').innerText = `รอบที่: ${curRep} / ${p.reps}`;
+    document.getElementById('ai-stars').innerText = `⭐ ${totalStars} ดวง`;
+  }
+
+  function calculateAngle(a, b, c) {
+      let radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+      let angle = Math.abs(radians * 180.0 / Math.PI);
+      if (angle > 180.0) angle = 360.0 - angle;
+      return angle;
+  }
+
+  function calcDist(a, b) {
+      return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+  }
+
+  // ระบบตรวจจับท่าคอแบบปรับตามสัดส่วนโครงสร้างใบหน้าผู้ใช้งานจริง (Adaptive AI Engine)
+  function checkPose(lm, type) {
+      const nose = lm[0];
+      const lEar = lm[7], rEar = lm[8];
+      const lSh = lm[11], rSh = lm[12];
+      const lElbow = lm[13], rElbow = lm[14];
+      const lWrist = lm[15], rWrist = lm[16];
+      const lHip = lm[23], rHip = lm[24];
+      const lKnee = lm[25], rKnee = lm[26];
+      
+      if (nose.visibility < 0.5 || lSh.visibility < 0.5 || rSh.visibility < 0.5) return false;
+
+      // วัดขนาดกรอบหน้า (ระยะระหว่างหูขวา-ซ้าย) และความกว้างไหล่เพื่อใช้เป็นเกณฑ์สัดส่วนแปรผัน
+      const headSize = calcDist(lEar, rEar);
+      const shoulderWidth = calcDist(lSh, rSh);
+      const earMidY = (lEar.y + rEar.y) / 2;
+
+      switch(type) {
+          case "up": // เงยหน้า (จมูกต้องยกตัวสูงขึ้นเหนือแนวใบหูอย่างชัดเจนสัมพันธ์กับขนาดกรอบหน้า)
+              return (earMidY - nose.y > headSize * 0.15);
+              
+          case "down": // ก้มหน้า (จมูกต้องทิ้งตัวต่ำลงใต้แนวใบหูอย่างชัดเจนสัมพันธ์กับขนาดกรอบหน้า)
+              return (nose.y - earMidY > headSize * 0.35);
+
+          case "neck_left": // เอียงคอซ้าย (หูซ้ายเข้าใกล้ไหล่ซ้ายมากกว่าอัตราส่วนปกติของหูขวากับไหล่ขวา)
+              return (calcDist(lEar, lSh) < calcDist(rEar, rSh) * 0.8);
+
+          case "neck_right": // เอียงคอขวา (หูขวาเข้าใกล้ไหล่ขวามากกว่าอัตราส่วนปกติของหูซ้ายกับไหล่ซ้าย)
+              return (calcDist(rEar, rSh) < calcDist(lEar, lSh) * 0.8);
+
+          case "static": // เกร็งคอต้านมือ (ข้อมือยกสูงขึ้นมาแตะบริเวณตำแหน่งหัว/กรอบหน้า)
+              return (calcDist(lWrist, nose) < headSize * 1.6 || calcDist(rWrist, nose) < headSize * 1.6);
+
+          case "pull": // ดึงยางยืดระดับอก
+              return (calcDist(lWrist, rWrist) > shoulderWidth * 1.8);
+
+          case "pushwall": // ดันกำแพงระดับอก
+              let leftArmAngle = calculateAngle(lSh, lElbow, lWrist);
+              let rightArmAngle = calculateAngle(rSh, rElbow, rWrist);
+              return (leftArmAngle < 150 && rightArmAngle < 150);
+
+          case "stretch_chest": // ยืดอกสะบักชิด
+              return (calcDist(lElbow, rElbow) > shoulderWidth * 1.5);
+
+          case "bridge": // ยกสะโพก (มองด้านข้างสรีระแนวระนาบ)
+              let leftHipAngle = calculateAngle(lSh, lHip, lKnee);
+              let rightHipAngle = calculateAngle(rSh, rHip, rKnee);
+              return (leftHipAngle > 140 || rightHipAngle > 140);
+
+          case "leg_stretch": // ยืดต้นขาด้านหลัง
+              let lHipFlex = calculateAngle(lSh, lHip, lKnee);
+              let lKneeStraight = calculateAngle(lHip, lKnee, lm[27]);
+              let rHipFlex = calculateAngle(rSh, rHip, rKnee);
+              let rKneeStraight = calculateAngle(rHip, rKnee, lm[28]);
+              return ((lHipFlex < 130 && lKneeStraight > 150) || (rHipFlex < 130 && rKneeStraight > 150));
+
+          default:
+              return true;
+      }
+  }
+
+  function onResults(res) {
+    canvasCtx.save(); canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(res.image, 0, 0, canvasElement.width, canvasElement.height);
+    
+    if (res.poseLandmarks) {
+      const p = db[aiPart][aiType][aiIdx]; 
+      const isCorrect = checkPose(res.poseLandmarks, p.type); 
+      const color = isCorrect ? '#28a745' : '#dc3545';
+      
+      document.getElementById('ai-border').style.borderColor = color; 
+      document.getElementById('ai-card').style.borderLeftColor = color;
+      
+      const feedback = document.getElementById('ai-feedback');
+      
+      // กรณีผู้ใช้งานทำท่าถูกต้อง และจำนวนรอบที่ทำยังไม่ครบเป้าหมาย
+      if(isCorrect && curRep < p.reps) {
+        feedback.innerText = `✅ ท่าทางถูกต้อง ค้างรอบที่ ${curRep + 1} ไว้!`; 
+        feedback.style.color = "var(--success)";
+        
+        let now = Date.now(); 
+        let dt = (now - lastFrameTime) / 1000;
+        
+        if(timer < p.time) {
+          timer += dt; 
+          document.getElementById('progress-fill').style.width = (timer / p.time * 100) + "%";
+          document.getElementById('timer-text').innerText = `${Math.floor(timer)} / ${p.time} วินาที`;
+        } else { 
+          // สะสมสถิติเมื่อค้างครบหนึ่งรอบเป้าหมายสำเร็จ
+          playDing(); // เปิดเสียงติ้งแจ้งเตือน
+          curRep++; 
+          totalStars += 1; // เพิ่มคะแนนดาวรางวัลสะสมทีละ 1 ดวง
+          timer = 0; 
+          
+          document.getElementById('ai-reps').innerText = `รอบที่: ${curRep} / ${p.reps}`;
+          document.getElementById('ai-stars').innerText = `⭐ ${totalStars} ดวง`;
+          document.getElementById('progress-fill').style.width = "0%";
+          
+          if(curRep >= p.reps) {
+              feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
+              document.getElementById('next-pose-btn').style.display = "block"; 
+          }
+        }
+      } else if (curRep >= p.reps) {
+         feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
+         feedback.style.color = "var(--success)";
+      } else { 
+        feedback.innerText = "❌ จัดท่าทางไม่ถูกต้อง"; 
+        feedback.style.color = "var(--danger)"; 
+      }
+      
+      lastFrameTime = Date.now();
+      drawConnectors(canvasCtx, res.poseLandmarks, POSE_CONNECTIONS, {color: color, lineWidth: 4});
+      drawLandmarks(canvasCtx, res.poseLandmarks, {color: color, lineWidth: 1, radius: 2});
+    } canvasCtx.restore();
+  }
+
+  function initMediaPipe() {
+    const pose = new Pose({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+    pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 }); pose.onResults(onResults);
+    camera = new Camera(videoElement, { onFrame: async()=>await pose.send({image:videoElement}), width:480, height:640 }); camera.start();
+  }
+
+  function nextAIPose() { aiIdx++; if(aiIdx < db[aiPart][aiType].length) { showPreview(); } else { alert(`🏆 ยอดเยี่ยมมาก! คุณสะสมดาวรางวัลไปทั้งหมดได้ถึง ${totalStars} ดวง ครบทุกท่าแล้วครับ`); stopAI(); } }
+  function stopAI() { nav('ai-parts'); }
+</script>
+</body>
+</html>
