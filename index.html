@@ -578,13 +578,13 @@
   /* AI ENGINE CODE */
   let aiPart='', aiType='', aiIdx=0, timer=0, lastFrameTime=Date.now();
   let curRep = 0, totalStars = 0; 
-  let lastStateWasCorrect = true; // ใช้สำหรับตรวจจับจังหวะการทำผิดเพื่อเล่นเสียงแจ้งเตือน
+  let lastStateWasCorrect = true; // ตัวแปรคอยจับตาดูว่า เฟรมที่แล้วทำถูกอยู่รึเปล่า
   const videoElement = document.querySelector('.video-hidden');
   const canvasElement = document.querySelector('.output_canvas');
   const canvasCtx = canvasElement.getContext('2d');
   let camera = null;
 
-  // เสียงเมื่อทำถูกต้องสำเร็จ (เสียงติ๊กสั้น)
+  // เสียงเมื่อค้างจนสำเร็จครบเวลา (เสียงติ๊กสั้น)[cite: 1]
   function playDing() {
       try {
           const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -603,13 +603,13 @@
       }
   }
 
-  // เสียงแจ้งเตือนเมื่อทำท่าผิด (เสียงทุ้มต่ำ ตื่อตือ)
+  // เสียงเตือนจังหวะ "เขียวแล้วเปลี่ยนเป็นแดง" (เสียงแจ้งเตือนแบบฟีลทำผิด)
   function playFailSound() {
       try {
           const context = new (window.AudioContext || window.webkitAudioContext)();
           const now = context.currentTime;
           
-          // โน้ตตัวที่ 1
+          // คลื่นเสียงโน้ตตัวแรก
           const osc1 = context.createOscillator();
           const gain1 = context.createGain();
           osc1.type = 'sawtooth';
@@ -621,7 +621,7 @@
           osc1.start(now);
           osc1.stop(now + 0.15);
 
-          // โน้ตตัวที่ 2 ต่ำลงมา (ฟีลทำผิด)
+          // คลื่นเสียงโน้ตตัวที่สอง (ต่ำสะดุดแบบทำผิด)
           const osc2 = context.createOscillator();
           const gain2 = context.createGain();
           osc2.type = 'sawtooth';
@@ -798,7 +798,7 @@
           document.getElementById('progress-fill').style.width = (timer / p.time * 100) + "%";
           document.getElementById('timer-text').innerText = `${Math.floor(timer)} / ${p.time} วินาที`;
         } else { 
-          playDing(); // ทำถูกต้องครบเวลา -> เสียงติ๊กใส ๆ ดัง
+          playDing(); // สะสมเวลาครบกำหนด -> ดังติ๊กใสๆ[cite: 1]
           curRep++; 
           totalStars += 1; 
           timer = 0; 
@@ -812,18 +812,20 @@
               document.getElementById('next-pose-btn').style.display = "block"; 
           }
         }
-        lastStateWasCorrect = true; // บันทึกสถานะว่าก่อนหน้านี้ทำถูก
+        // บันทึกว่าเฟรมนี้ทำงานถูกต้อง (เขียว)
+        lastStateWasCorrect = true;
       } else if (curRep >= p.reps) {
          feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
          feedback.style.color = "var(--success)";
+         lastStateWasCorrect = true;
       } else { 
         feedback.innerText = "❌ จัดท่าทางไม่ถูกต้อง"; 
         feedback.style.color = "var(--danger)"; 
         
-        // ถ้าจังหวะก่อนหน้านี้ทำถูก แล้วจู่ๆ เปลี่ยนมาทำผิด (หลุดโฟกัส/จัดท่าเคลื่อน) ให้ส่งเสียงเตือนฟีลทำผิดทันที
+        // จังหวะหัวใจสำคัญ: ถ้าก่อนหน้านี้ทำถูก (เขียว) แต่เฟรมปัจจุบันทำผิด (แดง) ให้เปิดเสียงเตือนทันที!
         if (lastStateWasCorrect) {
             playFailSound();
-            lastStateWasCorrect = false;
+            lastStateWasCorrect = false; // ปิดล็อกเพื่อไม่ให้เสียงดังซ้ำซ้อนในเฟรมถัดไปจนกว่าจะกลับมาเขียวใหม่
         }
       }
       
@@ -855,4 +857,5 @@
   }
 </script>
 </body>
+</html>
 </html>
