@@ -143,11 +143,12 @@
       line-height: 1.6;
     }
 
+    /* --- เริ่มส่วนการแก้ไขสไตล์ปุ่มเรียนรู้สีน้ำเงินเข้ม --- */
     .btn-dark {
       width: 100%;
       background: var(--dark-blue);
       color: white;
-      padding: 20px;
+      padding: 10px 15px; /* ปรับ padding ให้เข้ากับ layout แถว */
       border-radius: 20px;
       margin: 10px 0;
       text-align: left;
@@ -155,25 +156,38 @@
       font-size: 16px;
       font-family: 'Kanit';
       cursor: pointer;
+      display: flex; /* กำหนดเป็น flex เพื่อจัดไอคอนและข้อความ */
+      align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
+      gap: 15px; /* ระยะห่างระหว่างไอคอนและข้อความ */
+      min-height: 90px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+    .btn-dark:active { transform: scale(0.98); }
+
+    /* สไตล์ตัวยึดตำแหน่งไอคอน (พื้นที่สี่เหลี่ยมสำหรับใส่รูป) */
+    .btn-icon-placeholder {
+      width: 70px; /* ขนาดของพื้นที่สี่เหลี่ยม */
+      height: 70px;
+      background-color: #244B8C; /* สีฟ้าอ่อนสำหรับตัวยึดตำแหน่ง */
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden; /* หากใส่รูปแล้วรูปใหญ่กว่าพื้นที่ ให้ตัดส่วนที่เกินออก */
+    }
+    
+    /* ปรับแต่งข้อความเมื่อมีไอคอน */
+    .btn-dark span {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding-left: 120px; 
-      position: relative;
-      overflow: hidden;
-      min-height: 90px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      line-height: 1.4;
     }
-    .btn-dark::before {
-      content: '';
-      position: absolute;
-      left: 15px;
-      top: 15px;
-      bottom: 15px;
-      width: 80px;
-      background: #153366;
-      border-radius: 12px;
-    }
+
+    /* ลบ pseudo-element เดิมที่ใช้สร้าง padding ทางซ้าย */
+    .btn-dark::before { display: none; }
+    /* --- จบส่วนการแก้ไขสไตล์ปุ่มเรียนรู้สีน้ำเงินเข้ม --- */
 
     .brand-title {
       font-size: 50px; 
@@ -224,7 +238,6 @@
     <img src="V/LG.png" alt="Logo">
   </div>
 
-  <!-- หน้าสแปลชรวมโลโก้ -->
   <div id="splash" class="screen center-screen" style="display: flex;">
     <div style="background: white; padding: 35px 25px; border-radius: 40px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 85%; max-width: 320px; box-sizing: border-box;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 20px;">
@@ -237,7 +250,6 @@
     </div>
   </div>
 
-  <!-- หน้าวิธีใช้งาน -->
   <div id="how-to-use" class="screen center-screen" style="display: none; padding: 10px;">
     <div style="background: white; padding: 25px 15px; border-radius: 35px; width: 100%; box-sizing: border-box; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
       <h2 style="color: var(--main-blue); margin-top: 0; font-weight: 600; font-size: 22px;">วิธีใช้งานแอปพลิเคชัน</h2>
@@ -277,11 +289,31 @@
         <div class="title-pill">เรียนรู้ 📖</div>
     </div>
     <div style="width: 100%; padding: 0 10px; box-sizing: border-box; margin-top: 10px; overflow-y: auto;">
-        <button class="btn-dark" onclick="showChoice('neck')">ท่าออกกำลังกาย<br>ระดับ : คอ</button>
-        <button class="btn-dark" onclick="showChoice('chest')">ท่าออกกำลังกาย<br>ระดับ : อก</button>
-        <button class="btn-dark" onclick="showChoice('waist')">ท่าออกกำลังกาย<br>ระดับ : เอว</button>
-        <button class="btn-dark" onclick="nav('learn-daily')">การใช้ชีวิตประจำวัน<br>เพื่อป้องกันปวดหลัง 💡</button>
-    </div>
+        
+        <button class="btn-dark" onclick="showChoice('neck')">
+            <div class="btn-icon-placeholder">
+                </div>
+            <span>ท่าออกกำลังกาย<br>ระดับ : คอ</span>
+        </button>
+        
+        <button class="btn-dark" onclick="showChoice('chest')">
+            <div class="btn-icon-placeholder">
+                </div>
+            <span>ท่าออกกำลังกาย<br>ระดับ : อก</span>
+        </button>
+        
+        <button class="btn-dark" onclick="showChoice('waist')">
+            <div class="btn-icon-placeholder">
+                </div>
+            <span>ท่าออกกำลังกาย<br>ระดับ : เอว</span>
+        </button>
+        
+        <button class="btn-dark" onclick="nav('learn-daily')">
+            <div class="btn-icon-placeholder">
+                </div>
+            <span>การใช้ชีวิตประจำวัน<br>เพื่อป้องกันปวดหลัง 💡</span>
+        </button>
+        </div>
   </div>
 
   <div id="learn-daily" class="screen" style="overflow-y: auto;">
@@ -367,13 +399,13 @@
         <div class="title-pill">โหมด AI 📋</div>
     </div>
     <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; padding-bottom: 20px;">
-        <button class="btn-white" onclick="startTraining('neck', 'strength')">ระดับคอ (แข็งแรง)</button>
-        <button class="btn-white" onclick="startTraining('neck', 'stretch')">ระดับคอ (ยืดหยุ่น)</button>
-        <button class="btn-white" onclick="startTraining('chest', 'strength')">ระดับอก (แข็งแรง)</button>
-        <button class="btn-white" onclick="startTraining('chest', 'stretch')">ระดับอก (ยืดหยุ่น)</button>
-        <button class="btn-white" onclick="startTraining('waist', 'strength')">ระดับเอว (แข็งแรง)</button>
-        <button class="btn-white" onclick="startTraining('waist', 'stretch')">ระดับเอว (ยืดหยุ่น)</button>
-    </div>
+        <button class="btn-white" onclick="startTraining('neck', 'strength')">ระดับคอ (เพิ่มความแข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('neck', 'stretch')">ระดับคอ (เพิ่มความยืดหยุ่น)</button>
+        <button class="btn-white" onclick="startTraining('chest', 'strength')">ระดับอก (เพิ่มความแข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('chest', 'stretch')">ระดับอก (เพิ่มความยืดหยุ่น)</button>
+        <button class="btn-white" onclick="startTraining('waist', 'strength')">ระดับเอว (เพิ่มความแข็งแรง)</button>
+        <button class="btn-white" onclick="startTraining('waist', 'stretch')">ระดับเอว (เพิ่มความยืดหยุ่น)</button>
+        </div>
   </div>
 
   <div id="ai-preview" class="screen">
@@ -423,6 +455,7 @@
 </div>
 
 <script>
+  // UI text config
   const uiLabels = {
     neck: { title: "คอ 📖", strength: "ท่าออกกำลังกายเพิ่มความแข็งแรง<br>ของกระดูกสันหลังระดับคอ", stretch: "ท่าออกกำลังกายเพิ่มความยืดหยุ่น<br>ของกระดูกสันหลังระดับคอ" },
     chest: { title: "อก 📖", strength: "ท่าออกกำลังกายเพิ่มความแข็งแรง<br>กล้ามเนื้อกระดูกสันหลังระดับอก", stretch: "ท่าออกกำลังกายเพิ่มความยืดหยุ่น<br>ของกล้ามเนื้อกระดูกสันหลังระดับอก" },
@@ -484,9 +517,7 @@
   let curDailyIdx = 0; 
 
   document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => { 
-      nav('how-to-use'); 
-    }, 4000); 
+    setTimeout(() => { nav('start'); }, 4000); 
   });
 
   function nav(id) {
@@ -575,16 +606,15 @@
     updateDailyUI();
   }
 
-  /* AI ENGINE CODE */
+  // --- AI ENGINE CODE (No changes here, kept for completeness) ---
   let aiPart='', aiType='', aiIdx=0, timer=0, lastFrameTime=Date.now();
   let curRep = 0, totalStars = 0; 
-  let lastStateWasCorrect = true; // ตัวแปรคอยจับตาดูว่า เฟรมที่แล้วทำถูกอยู่รึเปล่า
+  let lastStateWasCorrect = true;
   const videoElement = document.querySelector('.video-hidden');
   const canvasElement = document.querySelector('.output_canvas');
   const canvasCtx = canvasElement.getContext('2d');
   let camera = null;
 
-  // เสียงเมื่อค้างจนสำเร็จครบเวลา (เสียงติ๊กสั้น)[cite: 1]
   function playDing() {
       try {
           const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -603,13 +633,11 @@
       }
   }
 
-  // เสียงเตือนจังหวะ "เขียวแล้วเปลี่ยนเป็นแดง" (เสียงแจ้งเตือนแบบฟีลทำผิด)
   function playFailSound() {
       try {
           const context = new (window.AudioContext || window.webkitAudioContext)();
           const now = context.currentTime;
           
-          // คลื่นเสียงโน้ตตัวแรก
           const osc1 = context.createOscillator();
           const gain1 = context.createGain();
           osc1.type = 'sawtooth';
@@ -621,7 +649,6 @@
           osc1.start(now);
           osc1.stop(now + 0.15);
 
-          // คลื่นเสียงโน้ตตัวที่สอง (ต่ำสะดุดแบบทำผิด)
           const osc2 = context.createOscillator();
           const gain2 = context.createGain();
           osc2.type = 'sawtooth';
@@ -645,11 +672,8 @@
     document.getElementById('preview-instr').innerText = p.d;
     
     const vid = document.getElementById('preview-video');
-    if (p.video && p.video !== "") {
-        vid.src = p.video;
-    } else {
-        vid.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-    }
+    if (p.video && p.video !== "") { vid.src = p.video; } 
+    else { vid.src = "https://www.w3schools.com/html/mov_bbb.mp4"; }
     
     vid.load(); vid.play(); nav('ai-preview');
   }
@@ -659,11 +683,8 @@
     nav('training'); 
     updatePoseUI(); 
     lastFrameTime = Date.now();
-    if(!camera) {
-      initMediaPipe(); 
-    } else {
-      camera.start();
-    }
+    if(!camera) { initMediaPipe(); } 
+    else { camera.start(); }
   }
   
   function updatePoseUI() {
@@ -673,9 +694,7 @@
     document.getElementById('timer-text').innerText = `0 / ${p.time} วินาที`;
     document.getElementById('progress-fill').style.width = "0%";
     document.getElementById('next-pose-btn').style.display = "none";
-    timer = 0;
-    curRep = 0; 
-    lastStateWasCorrect = true;
+    timer = 0; curRep = 0; lastStateWasCorrect = true;
     document.getElementById('ai-reps').innerText = `รอบที่: ${curRep} / ${p.reps}`;
     document.getElementById('ai-stars').innerText = `⭐ ${totalStars} ดวง`;
   }
@@ -708,35 +727,20 @@
       const earMidY = (lEar.y + rEar.y) / 2;
 
       switch(type) {
-          case "up": 
-              return (earMidY - nose.y > headSize * 0.15);
-          case "down": 
-              return (nose.y - earMidY > headSize * 0.35);
-          case "neck_left": 
-          case "neck_diagonal_left":
-              return (calcDist(lEar, lSh) < calcDist(rEar, rSh) * 0.8);
-          case "neck_right": 
-          case "neck_diagonal_right":
-              return (calcDist(rEar, rSh) < calcDist(lEar, lSh) * 0.8);
-          case "static": 
-              return (calcDist(lWrist, nose) < headSize * 1.6 || calcDist(rWrist, nose) < headSize * 1.6);
-
-          case "pull_band_high": 
-              return (calcDist(lWrist, rWrist) > shoulderWidth * 1.7);
-          case "pull_band_low":
-              return (calcDist(lWrist, rWrist) > shoulderWidth * 1.3 && calcDist(lElbow, lSh) < shoulderWidth * 0.6);
+          case "up": return (earMidY - nose.y > headSize * 0.15);
+          case "down": return (nose.y - earMidY > headSize * 0.35);
+          case "neck_left": case "neck_diagonal_left": return (calcDist(lEar, lSh) < calcDist(rEar, rSh) * 0.8);
+          case "neck_right": case "neck_diagonal_right": return (calcDist(rEar, rSh) < calcDist(lEar, lSh) * 0.8);
+          case "static": return (calcDist(lWrist, nose) < headSize * 1.6 || calcDist(rWrist, nose) < headSize * 1.6);
+          case "pull_band_high": return (calcDist(lWrist, rWrist) > shoulderWidth * 1.7);
+          case "pull_band_low": return (calcDist(lWrist, rWrist) > shoulderWidth * 1.3 && calcDist(lElbow, lSh) < shoulderWidth * 0.6);
           case "pushwall": 
               let leftArmAngle = calculateAngle(lSh, lElbow, lWrist);
               let rightArmAngle = calculateAngle(rSh, rElbow, rWrist);
               return (leftArmAngle < 150 && rightArmAngle < 150);
-          case "scapular_squeeze": 
-          case "stretch_chest_1":
-              return (calcDist(lElbow, rElbow) > shoulderWidth * 1.4);
-          case "stretch_chest_2":
-              return (calcDist(lWrist, rWrist) < shoulderWidth * 0.5 && nose.y < earMidY);
-
-          case "abdominal_hollow":
-              return (Math.abs(lHip.y - lSh.y) < shoulderWidth * 0.6);
+          case "scapular_squeeze": case "stretch_chest_1": return (calcDist(lElbow, rElbow) > shoulderWidth * 1.4);
+          case "stretch_chest_2": return (calcDist(lWrist, rWrist) < shoulderWidth * 0.5 && nose.y < earMidY);
+          case "abdominal_hollow": return (Math.abs(lHip.y - lSh.y) < shoulderWidth * 0.6);
           case "bridge": 
               let leftHipAngle = calculateAngle(lSh, lHip, lKnee);
               let rightHipAngle = calculateAngle(rSh, rHip, rKnee);
@@ -744,24 +748,17 @@
           case "cat_cow":
               let spineAngle = calculateAngle(lSh, lHip, lKnee);
               return (spineAngle < 130 || spineAngle > 160);
-          case "bird_dog":
-              return (lWrist.y < lSh.y || rWrist.y < rSh.y || lAnkle.y < lHip.y || rAnkle.y < rHip.y);
-          
-          case "knee_to_chest":
-              return (calcDist(lKnee, lSh) < shoulderWidth * 1.2 || calcDist(rKnee, rSh) < shoulderWidth * 1.2);
+          case "bird_dog": return (lWrist.y < lSh.y || rWrist.y < rSh.y || lAnkle.y < lHip.y || rAnkle.y < rHip.y);
+          case "knee_to_chest": return (calcDist(lKnee, lSh) < shoulderWidth * 1.2 || calcDist(rKnee, rSh) < shoulderWidth * 1.2);
           case "leg_stretch": 
               let lHipFlex = calculateAngle(lSh, lHip, lKnee);
               let lKneeStraight = calculateAngle(lHip, lKnee, lAnkle);
               let rHipFlex = calculateAngle(rSh, rHip, rKnee);
               let rKneeStraight = calculateAngle(rHip, rKnee, rAnkle);
               return ((lHipFlex < 135 && lKneeStraight > 145) || (rHipFlex < 135 && rKneeStraight > 145));
-          case "trunk_rotation":
-              return (Math.abs(lKnee.x - rKnee.x) < shoulderWidth * 0.5);
-          case "child_pose":
-              return (calcDist(lWrist, lHip) > shoulderWidth * 1.8 && calcDist(lHip, lAnkle) < shoulderWidth * 0.8);
-
-          default:
-              return true;
+          case "trunk_rotation": return (Math.abs(lKnee.x - rKnee.x) < shoulderWidth * 0.5);
+          case "child_pose": return (calcDist(lWrist, lHip) > shoulderWidth * 1.8 && calcDist(lHip, lAnkle) < shoulderWidth * 0.8);
+          default: return true;
       }
   }
 
@@ -783,52 +780,34 @@
       
       document.getElementById('ai-border').style.borderColor = color; 
       document.getElementById('ai-card').style.borderLeftColor = color;
-      
       const feedback = document.getElementById('ai-feedback');
       
       if(isCorrect && curRep < p.reps) {
-        feedback.innerText = `✅ ท่าทางถูกต้อง ค้างรอบที่ ${curRep + 1} ไว้!`; 
-        feedback.style.color = "var(--success)";
-        
-        let now = Date.now(); 
-        let dt = (now - lastFrameTime) / 1000;
-        
+        feedback.innerText = `✅ ท่าทางถูกต้อง ค้างรอบที่ ${curRep + 1} ไว้!`; feedback.style.color = "var(--success)";
+        let now = Date.now(); let dt = (now - lastFrameTime) / 1000;
         if(timer < p.time) {
           timer += dt; 
           document.getElementById('progress-fill').style.width = (timer / p.time * 100) + "%";
           document.getElementById('timer-text').innerText = `${Math.floor(timer)} / ${p.time} วินาที`;
         } else { 
-          playDing(); // สะสมเวลาครบกำหนด -> ดังติ๊กใสๆ[cite: 1]
-          curRep++; 
-          totalStars += 1; 
-          timer = 0; 
-          
+          playDing();
+          curRep++; totalStars += 1; timer = 0; 
           document.getElementById('ai-reps').innerText = `รอบที่: ${curRep} / ${p.reps}`;
           document.getElementById('ai-stars').innerText = `⭐ ${totalStars} ดวง`;
           document.getElementById('progress-fill').style.width = "0%";
-          
           if(curRep >= p.reps) {
               feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
               document.getElementById('next-pose-btn').style.display = "block"; 
           }
         }
-        // บันทึกว่าเฟรมนี้ทำงานถูกต้อง (เขียว)
         lastStateWasCorrect = true;
       } else if (curRep >= p.reps) {
-         feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
-         feedback.style.color = "var(--success)";
+         feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`; feedback.style.color = "var(--success)";
          lastStateWasCorrect = true;
       } else { 
-        feedback.innerText = "❌ จัดท่าทางไม่ถูกต้อง"; 
-        feedback.style.color = "var(--danger)"; 
-        
-        // จังหวะหัวใจสำคัญ: ถ้าก่อนหน้านี้ทำถูก (เขียว) แต่เฟรมปัจจุบันทำผิด (แดง) ให้เปิดเสียงเตือนทันที!
-        if (lastStateWasCorrect) {
-            playFailSound();
-            lastStateWasCorrect = false; // ปิดล็อกเพื่อไม่ให้เสียงดังซ้ำซ้อนในเฟรมถัดไปจนกว่าจะกลับมาเขียวใหม่
-        }
+        feedback.innerText = "❌ จัดท่าทางไม่ถูกต้อง"; feedback.style.color = "var(--danger)"; 
+        if (lastStateWasCorrect) { playFailSound(); lastStateWasCorrect = false; }
       }
-      
       lastFrameTime = Date.now();
       drawConnectors(canvasCtx, res.poseLandmarks, POSE_CONNECTIONS, {color: color, lineWidth: 4});
       drawLandmarks(canvasCtx, res.poseLandmarks, {color: color, lineWidth: 1, radius: 2});
@@ -841,21 +820,8 @@
     camera = new Camera(videoElement, { onFrame: async()=>await pose.send({image:videoElement}), width:480, height:640 }); camera.start();
   }
 
-  function nextAIPose() { 
-    aiIdx++; 
-    if(aiIdx < db[aiPart][aiType].length) { 
-      showPreview(); 
-    } else { 
-      alert(`🏆 ยอดเยี่ยมมาก! คุณสะสมดาวรางวัลไปทั้งหมดได้ถึง ${totalStars} ดวง ครบทุกท่าแล้วครับ`); 
-      stopAI(); 
-    } 
-  }
-
-  function stopAI() { 
-    if(camera) { camera.stop(); }
-    nav('ai-parts'); 
-  }
+  function nextAIPose() { aiIdx++; if(aiIdx < db[aiPart][aiType].length) { showPreview(); } else { alert(`🏆 ยอดเยี่ยมมาก! คุณสะสมดาวรางวัลไปทั้งหมดได้ถึง ${totalStars} ดวง ครบทุกท่าแล้วครับ`); stopAI(); } }
+  function stopAI() { if(camera) { camera.stop(); } nav('ai-parts'); }
 </script>
 </body>
-</html>
 </html>
