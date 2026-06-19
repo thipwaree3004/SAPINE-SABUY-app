@@ -454,7 +454,8 @@
     </div>
 
     <div id="ai-feedback" style="font-weight: 600; color: var(--danger); text-align: center; background: white; padding: 10px 20px; border-radius: 20px; margin-bottom: 10px; width: 90%; box-sizing: border-box;">❌ จัดท่าทางไม่ถูกต้อง</div>
-    <button id="next-pose-btn" class="btn-white" style="display:none; background: var(--success); color: white; width: 100%; font-size: 18px;" onclick="nextAIPose()">ท่าต่อไป ✅</button>
+    
+    <button id="next-pose-btn" class="btn-white" style="display: block; background: #ccc; color: #888; width: 100%; font-size: 18px; cursor: not-allowed;" onclick="nextAIPose()" disabled>ท่าต่อไป 🔒</button>
   </div>
 
 </div>
@@ -470,7 +471,7 @@
   const dailyDb = [
     { n: "ท่านั่ง", d: "นั่งหลังตรง ยืดตัวขึ้นและเปิดไหล่ออก ที่นั่งรองรับก้นและโคนขาได้ทั้งหมด ความสูงของที่นั่งพอดีที่วางฝ่าเท้าเต็มพื้นได้ หรือมีที่พักเท้า", img: "V/1.png" },
     { n: "ท่ายืน", d: "ยืนตัวตรง ยืดอกขึ้นและกดไหล่ลง ยืนแยกเท้าเล็กน้อย ความกว้างไม่เกินความกว้างของช่วงไหล่ ปล่อยแขนไว้ข้างตัวตามสบาย ยืนลงน้ำหนักเท้าทั้งสองข้างให้เท่ากัน", img: "V/2.png" },
-    { n: "ท่ายกของ", d: "เดินเข้าใกล้สิ่งของ ย่อตัวลง(ไม่ก้มหลัง) ยกของให้ชิดตัว ลำตัวตรงแล้วลุกขึ้นด้วยกำลังขา", img: "V/3.png" },
+    { n: "ท่ายยกของ", d: "เดินเข้าใกล้สิ่งของ ย่อตัวลง(ไม่ก้มหลัง) ยกของให้ชิดตัว ลำตัวตรงแล้วลุกขึ้นด้วยกำลังขา", img: "V/3.png" },
     { n: "การขับรถ", d: "นั่งตัวตรงหลังชิดกับเบาะ ระยะห่างของพวงมาลัยกับเบาะมีความเหมาะสม แขนงอเล็กน้อย", img: "V/4.png" }
   ];
 
@@ -611,7 +612,7 @@
     updateDailyUI();
   }
 
-  // --- AI ENGINE CODE (No changes here, kept for completeness) ---
+  // --- AI ENGINE CODE ---
   let aiPart='', aiType='', aiIdx=0, timer=0, lastFrameTime=Date.now();
   let curRep = 0, totalStars = 0; 
   let lastStateWasCorrect = true;
@@ -698,7 +699,16 @@
     document.getElementById('ai-instr').innerText = p.d;
     document.getElementById('timer-text').innerText = `0 / ${p.time} วินาที`;
     document.getElementById('progress-fill').style.width = "0%";
-    document.getElementById('next-pose-btn').style.display = "none";
+    
+    // รีเซ็ตปุ่มเป็นสีเทากดไม่ได้
+    const nextBtn = document.getElementById('next-pose-btn');
+    nextBtn.style.display = "block";
+    nextBtn.style.background = "#ccc";
+    nextBtn.style.color = "#888";
+    nextBtn.style.cursor = "not-allowed";
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = "ท่าต่อไป 🔒";
+
     timer = 0; curRep = 0; lastStateWasCorrect = true;
     document.getElementById('ai-reps').innerText = `รอบที่: ${curRep} / ${p.reps}`;
     document.getElementById('ai-stars').innerText = `⭐ ${totalStars} ดวง`;
@@ -802,12 +812,28 @@
           document.getElementById('progress-fill').style.width = "0%";
           if(curRep >= p.reps) {
               feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`;
-              document.getElementById('next-pose-btn').style.display = "block"; 
+              
+              // เปลี่ยนปุ่มเป็นสีเขียวกดได้
+              const nextBtn = document.getElementById('next-pose-btn');
+              nextBtn.style.background = "var(--success)";
+              nextBtn.style.color = "white";
+              nextBtn.style.cursor = "pointer";
+              nextBtn.disabled = false;
+              nextBtn.innerHTML = "ท่าต่อไป ✅";
           }
         }
         lastStateWasCorrect = true;
       } else if (curRep >= p.reps) {
          feedback.innerText = `🎉 ยอดเยี่ยม! ทำครบ ${p.reps} รอบตามคำแนะนำแล้ว`; feedback.style.color = "var(--success)";
+         
+         // ย้ำการเปลี่ยนปุ่มเป็นสีเขียวกดได้ ในกรณีที่มีการขยับหลังทำครบ
+         const nextBtn = document.getElementById('next-pose-btn');
+         nextBtn.style.background = "var(--success)";
+         nextBtn.style.color = "white";
+         nextBtn.style.cursor = "pointer";
+         nextBtn.disabled = false;
+         nextBtn.innerHTML = "ท่าต่อไป ✅";
+
          lastStateWasCorrect = true;
       } else { 
         feedback.innerText = "❌ จัดท่าทางไม่ถูกต้อง"; feedback.style.color = "var(--danger)"; 
