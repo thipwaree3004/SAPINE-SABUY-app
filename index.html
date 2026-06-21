@@ -757,7 +757,11 @@
               let rightArmAngle = calculateAngle(rSh, rElbow, rWrist);
               return (leftArmAngle < 150 && rightArmAngle < 150);
           case "scapular_squeeze": case "stretch_chest_1": 
-              return (calcDist(lElbow, rElbow) > shoulderWidth * 1.1);
+              // 1. เช็กว่ายกศอกขึ้นมาระดับใกล้เคียงกับไหล่ (ไม่ทิ้งแขนแนบลำตัว)
+              let elbowsUp = (lElbow.y < lSh.y + shoulderWidth * 0.3) && (rElbow.y < rSh.y + shoulderWidth * 0.3);
+              // 2. เช็กว่ากางศอกออกกว้างกว่าไหล่
+              let elbowsWide = calcDist(lElbow, rElbow) > shoulderWidth * 1.2;
+              return elbowsUp && elbowsWide;
           case "stretch_chest_2": return (calcDist(lWrist, rWrist) < shoulderWidth * 0.5 && nose.y < earMidY);
           case "abdominal_hollow": return (Math.abs(lHip.y - lSh.y) < shoulderWidth * 0.6);
           case "bridge": 
