@@ -756,7 +756,8 @@
               let leftArmAngle = calculateAngle(lSh, lElbow, lWrist);
               let rightArmAngle = calculateAngle(rSh, rElbow, rWrist);
               return (leftArmAngle < 150 && rightArmAngle < 150);
-          case "scapular_squeeze": case "stretch_chest_1": return (calcDist(lElbow, rElbow) > shoulderWidth * 1.4);
+          case "scapular_squeeze": case "stretch_chest_1": 
+              return (calcDist(lElbow, rElbow) > shoulderWidth * 1.1);
           case "stretch_chest_2": return (calcDist(lWrist, rWrist) < shoulderWidth * 0.5 && nose.y < earMidY);
           case "abdominal_hollow": return (Math.abs(lHip.y - lSh.y) < shoulderWidth * 0.6);
           case "bridge": 
